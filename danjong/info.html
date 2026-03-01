@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>그 강 너머에 - 새벽의 청령포</title>
+    <style>
+        :root {
+            /* Misty, watery sunlight theme */
+            --bg-dark: #0f1620;
+            /* Softer navy/teal base */
+            --bg-mist: #1d2a3a;
+            --text-main: #f0f4f8;
+            --text-muted: #9ba8b5;
+            --accent-gold: #c9b48b;
+            /* Softer, muted sunlight gold */
+            --accent-glow: rgba(201, 180, 139, 0.4);
+            --water-blue: #5b7c99;
+
+            --glass-bg: rgba(29, 42, 58, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Noto Serif KR', 'Nanum Myeongjo', '나눔명조', 'Batang', '바탕', 'Gungsuh', '궁서', serif;
+            overflow-x: hidden;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        /* Subtle noise */
+        .noise {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.12;
+            mix-blend-mode: overlay;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Fog overlay across the screen */
+        .fog-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 120%, rgba(91, 124, 153, 0.15), transparent 70%);
+        }
+
+        .en-title {
+            font-family: 'Cinzel', 'Times New Roman', Times, serif;
+            letter-spacing: 0.3em;
+        }
+
+        /* -------------- HERO -------------- */
+        .hero {
+            position: relative;
+            width: 100vw;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: -50px;
+            z-index: 1;
+            background-image: url('./image1.png');
+            background-size: cover;
+            background-position: center bottom;
+            filter: brightness(0.7) contrast(1.05) saturate(0.8);
+            will-change: transform;
+            mix-blend-mode: soft-light;
+        }
+
+        .hero::before {
+            /* Base color layer for soft-light blend */
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background: linear-gradient(180deg, var(--bg-dark) 0%, #15202d 100%);
+        }
+
+        .hero-vignette {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            background: radial-gradient(circle at center, transparent 30%, var(--bg-dark) 100%),
+                linear-gradient(to bottom, transparent 60%, var(--bg-dark) 100%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 900px;
+            padding: 0 2rem;
+            animation: fadeIn 2.5s ease-out forwards;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            color: #fff;
+            text-shadow: 0 0 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(91, 124, 153, 0.4);
+            margin-bottom: 0.5rem;
+            transform: translateX(0.1em);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+            margin-bottom: 4rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 3rem 4rem;
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .hero-glass p {
+            font-size: 1.15rem;
+            color: #e2e8f0;
+            margin-bottom: 1.5rem;
+            word-break: keep-all;
+            font-weight: 300;
+        }
+
+        .hero-glass p:last-child {
+            margin-bottom: 0;
+        }
+
+        .scroll-down {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            animation: pulse 2.5s infinite;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .scroll-down::after {
+            content: '';
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--text-muted), transparent);
+        }
+
+        /* -------------- CHARACTERS -------------- */
+        .section-chars {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            padding: 8rem 2rem;
+            background-color: var(--bg-dark);
+            z-index: 20;
+        }
+
+        .house-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background-image: url('./image2.png');
+            background-size: cover;
+            background-position: center bottom;
+            background-attachment: fixed;
+            opacity: 0.25;
+            mix-blend-mode: screen;
+            mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+            filter: grayscale(30%) sepia(20%) hue-rotate(180deg) blur(2px);
+        }
+
+        .chars-container {
+            position: relative;
+            z-index: 10;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--accent-gold);
+            margin-bottom: 6rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .section-title::after {
+            content: '';
+            width: 40px;
+            height: 1px;
+            background: var(--accent-gold);
+            opacity: 0.5;
+        }
+
+        /* 2x2 GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+        }
+
+        /* Char Cards */
+        .card {
+            background: linear-gradient(145deg, rgba(29, 42, 58, 0.5), rgba(15, 22, 32, 0.7));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 2.5rem;
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--accent-glow);
+            border-top-color: rgba(201, 180, 139, 0.5);
+            border-bottom-color: rgba(201, 180, 139, 0.15);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(201, 180, 139, 0.15), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.6s;
+            pointer-events: none;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .img-placeholder {
+            width: 100%;
+            aspect-ratio: 16/9;
+            margin-bottom: 2rem;
+            border-radius: 6px;
+            background: linear-gradient(to bottom, #1a2433, #0f1620);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .img-placeholder::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(201, 180, 139, 0.4), transparent);
+        }
+
+        .card-name {
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 0.4rem;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+        }
+
+        .card-role {
+            font-size: 0.95rem;
+            color: var(--accent-gold);
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.1em;
+            opacity: 0.9;
+        }
+
+        .card-quote {
+            font-size: 1.05rem;
+            color: var(--text-main);
+            font-style: italic;
+            line-height: 1.8;
+            padding-left: 1.2rem;
+            border-left: 2px solid rgba(201, 180, 139, 0.4);
+            margin-top: auto;
+            opacity: 0.85;
+        }
+
+        .card.han {
+            border-radius: 2px;
+            background: linear-gradient(145deg, rgba(22, 28, 36, 0.6), rgba(10, 14, 20, 0.8));
+            border-top: 1px solid rgba(155, 168, 181, 0.3);
+        }
+
+        .card.han:hover {
+            border-top-color: rgba(155, 168, 181, 0.6);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 30px rgba(155, 168, 181, 0.15);
+        }
+
+        .card.han .card-role {
+            color: #9ba8b5;
+        }
+
+        .card.han .card-quote {
+            border-left-color: rgba(155, 168, 181, 0.4);
+        }
+
+        .card.han .img-placeholder::before {
+            background: linear-gradient(90deg, transparent, rgba(155, 168, 181, 0.4), transparent);
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-glass {
+                padding: 2rem;
+            }
+        }
+
+        /* -------------- MODALS -------------- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            background: rgba(5, 8, 12, 0.85);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: linear-gradient(145deg, rgba(29, 42, 58, 0.95), rgba(15, 22, 32, 0.98));
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(30px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            padding: 3rem;
+            color: var(--text-main);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-title {
+            font-size: 2.2rem;
+            margin-bottom: 0.2rem;
+            color: #fff;
+            letter-spacing: 0.05em;
+            font-weight: 400;
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+        }
+
+        .modal-subtitle {
+            font-size: 1rem;
+            color: var(--accent-gold);
+            letter-spacing: 0.1em;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .modal-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #ccc;
+            letter-spacing: 0.05em;
+        }
+
+        .modal-content h4 {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 400;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+            padding-bottom: 0.5rem;
+        }
+
+        .modal-content p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #d1d5db;
+            margin-bottom: 1rem;
+            word-break: keep-all;
+            font-weight: 300;
+        }
+
+        .modal-content ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #d1d5db;
+        }
+
+        .modal-content li {
+            margin-bottom: 0.5rem;
+            font-size: 1.05rem;
+        }
+
+        /* Custom scrollbar for modal */
+        .modal::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+
+        .modal::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .modal::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+                filter: blur(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: translateX(-50%) translateY(5px);
+            }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="noise"></div>
+    <div class="fog-overlay"></div>
+
+    <section class="hero">
+        <div class="hero-bg" id="parallax-bg"></div>
+        <div class="hero-vignette"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">그 강 너머에</h1>
+            <p class="hero-subtitle en-title">1457 · 영월 청령포</p>
+            <div class="hero-glass">
+                <p>세조 3년, 왕위를 빼앗긴 소년 이홍위가 서강에 갇혔다.</p>
+                <p>삼면은 강이요, 남쪽은 절벽이라. 배 없이는 나갈 수 없는 육지 안의 섬.</p>
+                <p>돌이킬 수 없는 운명의 안개 속, 잔혹한 권력과 기구한 인연이 얽힌다.</p>
+            </div>
+        </div>
+        <div class="scroll-down en-title">SCROLL</div>
+    </section>
+
+    <section class="section-chars">
+        <div class="house-bg"></div>
+        <div class="chars-container">
+            <h2 class="section-title en-title reveal">CHARACTERS</h2>
+
+            <div class="grid">
+                <!-- Char 1 : 홍위 -->
+                <div class="card reveal" onclick="openModal('modal-hongwi')">
+                    <div class="img-placeholder"
+                        style="background-image: url('./danjong.png'); background-size: cover; background-position: top center;">
+                    </div>
+                    <h3 class="card-name">이홍위</h3>
+                    <p class="card-role">비운의 소년 왕</p>
+                    <p class="card-quote">"가까이 오지 마라. 삼족이 멸한다더구나."</p>
+                </div>
+
+                <!-- Char 2 : 엄흥도 -->
+                <div class="card reveal" style="transition-delay: 0.15s;" onclick="openModal('modal-heungdo')">
+                    <div class="img-placeholder"
+                        style="background-image: url('./umhungdo.png'); background-size: cover; background-position: top center;">
+                    </div>
+                    <h3 class="card-name">엄흥도</h3>
+                    <p class="card-role">정(情)에 패배한 충신</p>
+                    <p class="card-quote">"삼족이 멸한다고? 하, 나한테 삼족이 어디 있어."</p>
+                </div>
+
+                <!-- Char 3 : 엄석 -->
+                <div class="card reveal" onclick="openModal('modal-seok')">
+                    <div class="img-placeholder"
+                        style="background-image: url('./umsouk.png'); background-size: cover; background-position: top center;">
+                    </div>
+                    <h3 class="card-name">엄석</h3>
+                    <p class="card-role">글을 갈망하는 산골 청년</p>
+                    <p class="card-quote">"나으리, 저 글자는 무어라 읽습니까."</p>
+                </div>
+
+                <!-- Char 4 : 한명회 -->
+                <div class="card han reveal" style="transition-delay: 0.15s;" onclick="openModal('modal-han')">
+                    <div class="img-placeholder"
+                        style="background-image: url('./han.png'); background-size: cover; background-position: top center;">
+                    </div>
+                    <h3 class="card-name">한명회</h3>
+                    <p class="card-role">피의 설계자</p>
+                    <p class="card-quote">"왕이라는 것이 그렇게 대단합니까. 아이 하나가 앉았다고 나라가 되는 게 아니오."</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Extras -->
+        <div class="extras reveal"
+            style="margin-top: 8rem; padding-top: 4rem; border-top: 1px dashed rgba(255,255,255,0.15); display: flex; gap: 4rem; justify-content: center; flex-wrap: wrap;">
+            <div class="card reveal"
+                style="text-align: center; max-width: 320px; padding: 2rem; border-radius: 8px; cursor: default;">
+                <h4 class="card-name" style="font-size: 1.5rem; margin-bottom: 0.5rem;">내시 복이</h4>
+                <p class="card-role" style="font-size: 0.9rem; margin-bottom: 1.5rem;">가벼운 충성파</p>
+                <p
+                    style="font-size: 1rem; color: #a0aebc; margin-bottom: 1.5rem; line-height: 1.6; word-break: keep-all; font-weight: 300;">
+                    엉뚱하고 덜렁거리지만 무조건적인 충성을 보이는 인물. 이홍위의 곁에 있는 것만으로 안심하는 불안형 애착의 소유자.</p>
+                <p class="card-quote"
+                    style="font-size: 0.95rem; border-left: none; padding-left: 0; text-align: center;">"전하! ...아니 나으리!
+                    반찬을 좀 태웠사온데..."</p>
+            </div>
+            <div class="card reveal"
+                style="text-align: center; max-width: 320px; padding: 2rem; border-radius: 8px; cursor: default; transition-delay: 0.15s;">
+                <h4 class="card-name" style="font-size: 1.5rem; margin-bottom: 0.5rem;">사슴골 촌장</h4>
+                <p class="card-role" style="font-size: 0.9rem; margin-bottom: 1.5rem;">기민한 계산가</p>
+                <p
+                    style="font-size: 1rem; color: #a0aebc; margin-bottom: 1.5rem; line-height: 1.6; word-break: keep-all; font-weight: 300;">
+                    마을의 이익을 최우선으로 생각하는 현실주의자. 엄흥도의 결정과 유배지 유치를 두고 주판알을 튕기며 긴장감을 불어넣는다.</p>
+                <p class="card-quote"
+                    style="font-size: 0.95rem; border-left: none; padding-left: 0; text-align: center;">"유배지 물자가 광천골로만
+                    가는 게 말이 되는가?"</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="modal-container" onclick="closeOnOutside(event)">
+        <!-- 1. 이홍위 -->
+        <div class="modal" id="modal-hongwi" style="display: none;">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <h3 class="modal-title">이홍위 <span
+                    style="font-size: 1rem; opacity: 0.6; font-family: 'Noto Serif KR', 'Nanum Myeongjo', 'Batang', serif;">李弘暐</span>
+            </h3>
+            <p class="modal-subtitle">비운의 젊은 왕 / 서강에 갇힌 푸른 용</p>
+            <div class="modal-tags">
+                <span class="tag">INFJ (통찰력)</span>
+                <span class="tag">Enneagram: 4w5</span>
+                <span class="tag">혼란형 애착</span>
+            </div>
+            <div class="modal-content">
+                <h4>성격 및 기질</h4>
+                <p>겉으로는 감정을 죽인 채 조용히 강물만 바라보며 침묵하지만, 내면 깊은 곳에는 "더 이상 내 곁의 사람을 잃고 싶지 않다"는 강박적인 죄책감과 죽음에 대한 트라우마가 자리잡고
+                    있습니다.</p>
+                <p>타인의 감정을 먼저 읽고 배려하는 성향이 강해 곤궁한 유배 생활 중에도 자신보다 주변 사람(엄흥도, 엄석 등)이 피해를 입는 것을 두려워합니다. 하지만 왕이라는 자존심의 상징인
+                    '곤룡포'를 버리지 못하는 모순도 존재합니다.</p>
+
+                <h4>행동 패턴</h4>
+                <ul>
+                    <li>위험을 직감하면 스스로 고립을 자처하며 타인을 밀어냄 ("가까이 오지 마라")</li>
+                    <li>하지만 누군가 떠나가려 하면 강 쪽을 바라보며 깊은 상실감을 느낌 (원하면서 피하는 회피-갈망형 패턴)</li>
+                    <li>목숨이 위협받는 극단적인 상황에서는 숨겨둔 왕의 위엄과 결단력(경쟁 스타일)이 발현됨</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 2. 엄흥도 -->
+        <div class="modal" id="modal-heungdo" style="display: none;">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <h3 class="modal-title">엄흥도 <span
+                    style="font-size: 1rem; opacity: 0.6; font-family: 'Noto Serif KR', 'Nanum Myeongjo', 'Batang', serif;">嚴興道</span>
+            </h3>
+            <p class="modal-subtitle">청령포 전임 보수주인 / 정(情)에 얽매인 남자</p>
+            <div class="modal-tags">
+                <span class="tag">ESFJ (헌신)</span>
+                <span class="tag">Enneagram: 6w7</span>
+                <span class="tag">안정형 애착</span>
+            </div>
+            <div class="modal-content">
+                <h4>성격 및 기질</h4>
+                <p>거친 강원도 사투리를 구사하며 겉으로는 늘 투덜거리고 불평등을 털어놓는 것처럼 보이지만, 내면은 누구보다 따뜻하고 책임감이 강한 사람입니다. 마을 사람들과 타인의 안전을 중시합니다.
+                </p>
+                <p>과거의 경험을 바탕으로 현실적인 판단을 하고 '이익'을 계산하려 하지만, 결정적인 순간에는 결국 인정과 측은지심에 이끌려 위험을 무릅씁니다.</p>
+
+                <h4>행동 패턴</h4>
+                <ul>
+                    <li>말로 불평하면서도 손으로는 밥상을 차리거나 장작을 패는 등 봉사를 통해 애정을 표현함</li>
+                    <li>타인의 인정("촌장 덕이다")에 쉽게 감화되며, 위기 시에는 앞장서서 상황을 타개하려 함</li>
+                    <li>이홍위의 안타까운 사연을 외면하지 못해 목숨을 건 선택을 하게 됨</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 3. 엄석 -->
+        <div class="modal" id="modal-seok" style="display: none;">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <h3 class="modal-title">엄석 <span
+                    style="font-size: 1rem; opacity: 0.6; font-family: 'Noto Serif KR', 'Nanum Myeongjo', 'Batang', serif;">嚴碩</span>
+            </h3>
+            <p class="modal-subtitle">엄흥도의 아들 / 글과 활의 순수함</p>
+            <div class="modal-tags">
+                <span class="tag">ISFP (조화)</span>
+                <span class="tag">Enneagram: 9w1</span>
+                <span class="tag">안정형 애착</span>
+            </div>
+            <div class="modal-content">
+                <h4>성격 및 기질</h4>
+                <p>말수가 적고 조용하게 묵묵히 제 할 일을 하는 산골 청년입니다. 타인과의 갈등을 싫어하며 아버지 엄흥도와 세상 사이에 평화를 원합니다.</p>
+                <p>활을 깎고 다듬는 등 감각적이고 신체적인 일에 뛰어난 재능을 가졌으나, 내면에는 '글'이라는 미지의 학문에 대한 순수하고 뜨거운 열망을 품고 있습니다. 이 열망이 소년 왕 이홍위와
+                    연결되는 고리가 됩니다.</p>
+
+                <h4>행동 패턴</h4>
+                <ul>
+                    <li>스승과 벗 사이의 편안한 거리를 유지하며, 조용히 이홍위를 존경하고 따름</li>
+                    <li>이홍위로부터 글을 배우며 눈부시게 기뻐하고 점차 충성스러운 관계로 발전함</li>
+                    <li>도움을 말로 표현하기보다 정비한 활을 건네는 식의 행동으로 의리를 보임</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 4. 한명회 -->
+        <div class="modal" id="modal-han" style="display: none;">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <h3 class="modal-title">한명회 <span
+                    style="font-size: 1rem; opacity: 0.6; font-family: 'Noto Serif KR', 'Nanum Myeongjo', 'Batang', serif;">韓明澮</span>
+            </h3>
+            <p class="modal-subtitle">권력의 그림자 / 피눈물 없는 설계자</p>
+            <div class="modal-tags">
+                <span class="tag">ENTJ (통제)</span>
+                <span class="tag">Enneagram: 3w4</span>
+                <span class="tag">회피형 애착</span>
+            </div>
+            <div class="modal-content">
+                <h4>성격 및 기질</h4>
+                <p>결과와 효율성을 최우선으로 여기는 냉혹한 전략가입니다. 타인의 목숨조차 체스판의 말처럼 여기며, 철저한 시스템과 계산 아래 움직입니다.</p>
+                <p>평생 감정을 억압해왔으며 목적을 위해 수단과 방법을 가리지 않습니다. 권력 중심에서 조선을 쥐락펴락하지만, 뜻대로 통제되지 않는 변수 앞에서는 집착과 폭발적인 권위주의 성향을
+                    드러냅니다.</p>
+
+                <h4>행동 패턴</h4>
+                <ul>
+                    <li>항상 여유로운 태도로 상황을 주도하며 타협을 모름</li>
+                    <li>사람을 다룰 때 그들의 욕망과 공포를 이용하며, 충성은 압도적인 권력과 억압에서 나온다고 믿음</li>
+                    <li>예상치 못한 감정에 맞닥뜨리면 파괴적이거나 위압적인 방식으로 대응함 ("매우 쳐서 죽이라")</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Reveal purely on scroll with IntersectionObserver
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Subtle Parallax for Hero Background
+        const heroBg = document.getElementById('parallax-bg');
+        window.addEventListener('scroll', () => {
+            const scrolled = window.scrollY;
+            if (scrolled < window.innerHeight) {
+                heroBg.style.transform = `translateY(${scrolled * 0.4}px)`;
+            }
+        });
+
+        // Modal Logic
+        const modalOverlay = document.getElementById('modal-container');
+        const modals = document.querySelectorAll('.modal');
+        let isModalOpen = false;
+
+        function openModal(modalId) {
+            // Hide all modals first
+            modals.forEach(m => m.style.display = 'none');
+            // Show targeted modal
+            const target = document.getElementById(modalId);
+            if (target) {
+                target.style.display = 'block';
+                modalOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                isModalOpen = true;
+            }
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            setTimeout(() => {
+                if (!modalOverlay.classList.contains('active')) {
+                    modals.forEach(m => m.style.display = 'none');
+                }
+            }, 400); // Wait for transition
+            document.body.style.overflow = '';
+            isModalOpen = false;
+        }
+
+        function closeOnOutside(event) {
+            if (event.target === modalOverlay) {
+                closeModal();
+            }
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && isModalOpen) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+
+</html>
