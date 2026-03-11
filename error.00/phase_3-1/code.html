@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00A3FF",
+                        "background-light": "#f7f7f7",
+                        "background-dark": "#050505",
+                        "terminal-cyan": "#00A3FF",
+                        "terminal-red": "#FF3B30"
+                    },
+                    fontFamily: {
+                        display: ["Public Sans", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        .scanline {
+            background: linear-gradient(to bottom, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .top-secret-watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 10rem;
+            opacity: 0.03;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 0;
+            font-weight: 900;
+        }
+
+        .grid-bg {
+            background-image: radial-gradient(circle at 1px 1px, rgba(0, 163, 255, 0.08) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-dark font-display text-slate-100 text-[15px] md:text-[16px] leading-relaxed selection:bg-primary/30 min-h-screen">
+    <div class="top-secret-watermark font-mono">TOP SECRET</div>
+    <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden grid-bg">
+        <div class="layout-container flex h-full grow flex-col">
+
+            <header
+                class="flex items-center justify-between border-b border-primary/20 bg-background-dark/80 backdrop-blur-md px-6 md:px-20 py-4 sticky top-0 z-50">
+                <div class="flex items-center gap-8">
+                    <div class="flex items-center gap-3 text-primary">
+                        <span class="material-symbols-outlined text-3xl">terminal</span>
+                        <h2 class="text-xl md:text-2xl font-extrabold tracking-tighter font-mono">GHOST_PROTOCOL</h2>
+                    </div>
+                    <nav
+                        class="hidden md:flex items-center gap-8 font-mono text-sm uppercase tracking-widest text-slate-400">
+                        <a class="hover:text-primary transition-colors border-b-2 border-primary" href="#">Dashboard</a>
+                        <a class="hover:text-primary transition-colors border-b-2 border-transparent"
+                            href="#">Agents</a>
+                        <a class="hover:text-primary transition-colors border-b-2 border-transparent"
+                            href="#">Missions</a>
+                        <a class="hover:text-primary transition-colors border-b-2 border-transparent"
+                            href="#">Encryption</a>
+                    </nav>
+                </div>
+                <div class="flex items-center gap-6">
+                    <label
+                        class="hidden lg:flex items-center bg-primary/10 border border-primary/30 rounded-lg px-3 py-1.5 gap-2 group focus-within:border-primary">
+                        <span class="material-symbols-outlined text-primary text-xl">search</span>
+                        <input
+                            class="bg-transparent border-none focus:ring-0 text-sm placeholder:text-primary/50 text-primary font-mono w-48"
+                            placeholder="QUERY_DATABASE" />
+                    </label>
+                </div>
+            </header>
+
+            <main class="flex-1 px-6 md:px-20 py-8 relative z-10">
+                <div class="flex items-center gap-2 mb-8 font-mono text-xs text-primary/60 uppercase">
+                    <span class="hover:text-primary cursor-pointer transition-colors">Phase 3</span>
+                    <span class="material-symbols-outlined text-[10px]">chevron_right</span>
+                    <span class="hover:text-primary cursor-pointer transition-colors">Agent Dossiers</span>
+                    <span class="material-symbols-outlined text-[10px]">chevron_right</span>
+                    <span class="text-primary font-bold">Node (Han Si-on)</span>
+                </div>
+
+                <div class="grid grid-cols-12 gap-8">
+                    <!-- Left -->
+                    <div class="col-span-12 lg:col-span-4 space-y-6">
+                        <div
+                            class="relative group aspect-[4/5] rounded-xl overflow-hidden border border-primary/30 bg-black">
+                            <img id="agent-img"
+                                class="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 transition-all duration-700"
+                                src="../이미지/한시온.png" />
+                            <div class="absolute inset-0 scanline"></div>
+                            <div
+                                class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/40 to-transparent p-6">
+                                <h1 id="agent-name"
+                                    class="text-3xl md:text-4xl font-black text-white tracking-tighter uppercase font-mono">
+                                    HAN SI-ON</h1>
+                                <p class="text-primary font-bold tracking-widest text-sm" id="agent-code">[ CODE: NODE ]
+                                </p>
+                            </div>
+                            <div
+                                class="absolute top-4 right-4 bg-primary text-black px-2 py-1 font-mono text-[10px] font-bold">
+                                LEVEL 5 ACCESS</div>
+                        </div>
+
+                        <button
+                            class="w-full flex items-center justify-center gap-3 bg-primary text-background-dark py-4 rounded-xl font-mono font-black uppercase hover:bg-white hover:text-primary transition-all group overflow-hidden relative">
+                            <span class="material-symbols-outlined group-hover:animate-pulse">bolt</span>
+                            TOGGLE PERSONA_GLITCH
+                            <div
+                                class="absolute inset-0 bg-primary/20 translate-x-full group-hover:translate-x-0 transition-transform skew-x-12">
+                            </div>
+                        </button>
+
+                        <div
+                            class="border border-primary/20 bg-background-dark/40 backdrop-blur-sm p-6 rounded-xl space-y-4">
+                            <div class="flex justify-between items-center border-b border-primary/10 pb-2">
+                                <span class="font-mono text-xs text-primary/60">DESIGNATION</span>
+                                <span class="font-mono text-sm font-bold" id="agent-role">DIRECTOR / LEADER</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-primary/10 pb-2">
+                                <span class="font-mono text-xs text-primary/60">NAME / AGE / AFFIL.</span>
+                                <span class="font-mono text-sm font-bold" id="agent-brief"></span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-primary/10 pb-2">
+                                <span class="font-mono text-xs text-primary/60">MBTI</span>
+                                <span class="font-mono text-sm font-bold text-terminal-cyan" id="agent-mbti">ENFJ</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-mono text-xs text-primary/60">ATTACHMENT</span>
+                                <span class="font-mono text-sm font-bold" id="agent-attach">불안형</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-background-dark/40 border border-primary/20 rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-mono text-xs font-bold text-primary">ENNEAGRAM RADAR</h3>
+                                <span class="text-[10px] font-mono text-primary/60">CURRENT: <span id="ennea-current"
+                                        class="text-primary font-bold">2w1</span></span>
+                            </div>
+                            <div class="flex justify-center">
+                                <svg id="ennea-chart" width="260" height="260" viewBox="0 0 260 260">
+                                    <g id="ennea-grid"></g>
+                                    <polygon id="ennea-shape" fill="rgba(0,163,255,0.2)" stroke="#00A3FF"
+                                        stroke-width="1.5"></polygon>
+                                    <g id="ennea-labels" fill="#9ca3af"></g>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right -->
+                    <div class="col-span-12 lg:col-span-8 space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="bg-primary/5 border border-primary/20 p-5 rounded-xl">
+                                <p class="text-xs font-mono text-primary/60 mb-1">AGE_VARIANT</p>
+                                <p class="text-xl font-bold font-mono" id="agent-age">EARLY_30S</p>
+                            </div>
+                            <div class="bg-primary/5 border border-primary/20 p-5 rounded-xl">
+                                <p class="text-xs font-mono text-primary/60 mb-1">CURRENT_LOC</p>
+                                <p class="text-xl font-bold font-mono" data-location="Seoul, Korea">SEOUL_HQ</p>
+                            </div>
+                            <div class="bg-primary/5 border border-primary/20 p-5 rounded-xl">
+                                <p class="text-xs font-mono text-primary/60 mb-1">THREAT_LEVEL</p>
+                                <p class="text-xl font-bold font-mono text-terminal-red" id="agent-threat">CRITICAL</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-background-dark/40 border border-primary/20 rounded-xl p-6">
+                                <h3 class="font-mono text-sm font-bold text-primary mb-6 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sm">analytics</span>
+                                    TACTICAL_SKILLS_MATRIX
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between text-[11px] font-mono mb-1">
+                                            <span>HACKING</span><span id="skill-hack">98%</span>
+                                        </div>
+                                        <div class="h-1.5 bg-primary/10 w-full rounded-full overflow-hidden">
+                                            <div id="bar-hack" class="h-full bg-primary" style="width: 98%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-[11px] font-mono mb-1">
+                                            <span>LEADERSHIP</span><span id="skill-lead">92%</span>
+                                        </div>
+                                        <div class="h-1.5 bg-primary/10 w-full rounded-full overflow-hidden">
+                                            <div id="bar-lead" class="h-full bg-primary" style="width: 92%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-[11px] font-mono mb-1">
+                                            <span>DECEPTION</span><span id="skill-deceive">85%</span>
+                                        </div>
+                                        <div class="h-1.5 bg-primary/10 w-full rounded-full overflow-hidden">
+                                            <div id="bar-deceive" class="h-full bg-primary" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-[11px] font-mono mb-1">
+                                            <span>COMBAT</span><span id="skill-combat">74%</span>
+                                        </div>
+                                        <div class="h-1.5 bg-primary/10 w-full rounded-full overflow-hidden">
+                                            <div id="bar-combat" class="h-full bg-primary" style="width: 74%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-background-dark/40 border border-primary/20 rounded-xl p-6">
+                                <h3 class="font-mono text-sm font-bold text-primary mb-4 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-sm">report</span> AGENT SUMMARY
+                                </h3>
+                                <div class="space-y-3 font-mono text-sm text-slate-300">
+                                    <p id="agent-logline"></p>
+                                    <p id="agent-motto" class="text-primary/80"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-primary/10 border-l-4 border-primary p-6 rounded-r-xl">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="material-symbols-outlined text-primary">encrypted</span>
+                                <h3 class="font-mono text-lg font-black uppercase text-primary tracking-tighter">
+                                    Classified_Dossier</h3>
+                            </div>
+                            <div class="grid gap-6 font-mono text-sm text-slate-300">
+                                <div>
+                                    <p class="text-primary font-bold mb-2">외형</p>
+                                    <ul id="dossier-visual" class="space-y-1 list-disc list-inside"></ul>
+                                </div>
+                                <div>
+                                    <p class="text-primary font-bold mb-2">성격</p>
+                                    <ul id="dossier-personality" class="space-y-1 list-disc list-inside"></ul>
+                                </div>
+                                <div>
+                                    <p class="text-primary font-bold mb-2">개인 목표선</p>
+                                    <p id="dossier-stake"></p>
+                                </div>
+                                <div>
+                                    <p class="text-primary font-bold mb-2">말투/보이스</p>
+                                    <ul id="dossier-voice" class="space-y-1 list-disc list-inside"></ul>
+                                </div>
+                                <div>
+                                    <p class="text-primary font-bold mb-2">불편한 디테일/습관</p>
+                                    <p id="dossier-tell"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-4 pt-4 border-t border-primary/10">
+                            <button
+                                class="bg-primary/20 border border-primary/40 hover:bg-primary/30 text-primary font-mono text-xs px-6 py-3 rounded-lg flex items-center gap-2 transition-colors">
+                                <span class="material-symbols-outlined text-sm">download</span> DOWNLOAD_DOSSIER.PDF
+                            </button>
+                            <button
+                                class="bg-transparent border border-primary/20 hover:border-primary/60 text-primary/60 hover:text-primary font-mono text-xs px-6 py-3 rounded-lg flex items-center gap-2 transition-colors">
+                                <span class="material-symbols-outlined text-sm">history</span> VIEW_LOGS
+                            </button>
+                            <button
+                                class="ml-auto bg-terminal-red/20 border border-terminal-red/40 text-terminal-red font-mono text-xs px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-terminal-red/40 transition-colors">
+                                <span class="material-symbols-outlined text-sm">warning</span> TERMINATE_SESSION
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.body.style.opacity = "0";
+        document.body.style.transition = "opacity 0.5s ease";
+        window.onload = () => { document.body.style.opacity = "1"; };
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const agent = urlParams.get('agent');
+
+        const nameEl = document.getElementById('agent-name');
+        const imgEl = document.getElementById('agent-img');
+        const codeEl = document.getElementById('agent-code');
+        const roleEl = document.getElementById('agent-role');
+        const mbtiEl = document.getElementById('agent-mbti');
+        const attachEl = document.getElementById('agent-attach');
+        const ageEl = document.getElementById('agent-age');
+        const threatEl = document.getElementById('agent-threat');
+        const loglineEl = document.getElementById('agent-logline');
+        const mottoEl = document.getElementById('agent-motto');
+        const briefEl = document.getElementById('agent-brief');
+
+        const visualEl = document.getElementById('dossier-visual');
+        const personalityEl = document.getElementById('dossier-personality');
+        const stakeEl = document.getElementById('dossier-stake');
+        const voiceEl = document.getElementById('dossier-voice');
+        const tellEl = document.getElementById('dossier-tell');
+
+        const data = {
+            sion: {
+                name: "한시온",
+                code: "NODE",
+                img: "../이미지/한시온.png",
+                role: "DIRECTOR / LEADER",
+                mbti: "ENFJ",
+                brief: "30대 초반 / 사이버가드 소속 + 고스트프로토콜 리더",
+                age: "EARLY_30S",
+                threat: "CRITICAL",
+                logline: "다정한 미소로 팀을 이끄는 리더이자, 통제를 벗어나는 순간 서늘한 본성을 드러내는 이중스파이.",
+                motto: "“드디어 왔네요. 자네라면 해낼 수 있을 거라 믿습니다만.”",
+                visual: [
+                    "아몬드형 갈색 눈, 왼쪽 눈 밑 얕은 다크서클.",
+                    "다크 초콜릿 브라운 미디엄 헤어, 정돈된 스타일.",
+                    "181cm 역삼각형 체형, 네이비 수트 핏."
+                ],
+                personality: [
+                    "겉: 다정한 카리스마로 팀을 아우름.",
+                    "내면: 보호를 통해 통제권을 확인하는 강박.",
+                    "스트레스: 서늘한 독단적 통제자로 변모."
+                ],
+                stake: "부패한 이사회를 전복하고 고스트프로토콜을 설립·장악.",
+                voice: [
+                    "“드디어 왔네요. 자네라면 해낼 수 있을 거라 믿습니다만.”",
+                    "“내가 책임진다고 했을 텐데. 내 곁에서 한 발짝도 움직이지 마.”"
+                ],
+                tell: "스트레스 시 왼쪽 관자놀이 머리카락을 잡아당김. 왼손목 안쪽 화상 흉터.",
+                skills: { hack: 92, lead: 95, deceive: 85, combat: 70 },
+                ennea: { core: "2w1", values: [80, 95, 60, 55, 45, 50, 35, 40, 30] }
+            },
+            kael: {
+                name: "카엘 바흘레르",
+                code: "EXECUTIVE",
+                img: "../이미지/카엘.png",
+                role: "BOARD DIRECTOR",
+                mbti: "INTJ",
+                brief: "20대 후반 / 사이버가드 최연소 이사",
+                age: "LATE_20S",
+                threat: "SEVERE",
+                logline: "완벽하게 재단된 엘리트. 모든 것을 계산 아래 두지만 유일한 변수 앞에서 소유욕을 발동한다.",
+                motto: "“내 허락 없이 다치지 마십시오. 아주 불쾌하니까.”",
+                visual: [
+                    "짙은 회갈색 눈동자, 깊은 수직 눈매.",
+                    "애쉬 브라운 웨이브, 럭셔리한 무심함.",
+                    "187cm 날카로운 실루엣, 올블랙 수트."
+                ],
+                personality: [
+                    "겉: 세련된 젊은 귀족, 감정 절제.",
+                    "내면: 완벽 집착과 인정 갈망.",
+                    "스트레스: 소유욕과 폭력성 조용히 발동."
+                ],
+                stake: "불법 데이터 네트워크 장악 및 후계 자격 쟁취.",
+                voice: [
+                    "“당신, 내 계획을 꽤 재미있게 부수고 있군요.”",
+                    "“내 허락 없이 다치지 마십시오. 아주 불쾌하니까.”"
+                ],
+                tell: "통제가 흔들릴 때 오른손 엄지 손톱 옆면을 긁는다.",
+                skills: { hack: 84, lead: 88, deceive: 92, combat: 58 },
+                ennea: { core: "3w4", values: [45, 35, 95, 80, 50, 40, 30, 55, 25] }
+            },
+            seoha: {
+                name: "윤서하",
+                code: "ALPHA",
+                img: "../이미지/윤서하.png",
+                role: "FIELD LEAD",
+                mbti: "ISTP",
+                brief: "20대 후반 / 보안 컨설턴트 · 작전 팀장",
+                age: "LATE_20S",
+                threat: "HIGH",
+                logline: "말보다 행동이 앞서는 단단한 현장 지휘관. 무심한 태도 뒤에 맹목적 보호 본능을 숨긴다.",
+                motto: "“내 등 뒤에 있어라.”",
+                visual: [
+                    "깊은 흑안, 은폐용 금테 안경.",
+                    "애쉬 블론드 미디엄 컷, 거칠게 넘김.",
+                    "184cm 실전 압축 근육, 차콜 오버사이즈."
+                ],
+                personality: [
+                    "겉: 과묵하고 감정 기복 없는 기둥.",
+                    "내면: 보호 실패 공포와 과잉 통제.",
+                    "스트레스: 목소리 낮아지고 행동 거칠어짐."
+                ],
+                stake: "국정원 비밀 요원으로서 해커 조직 분쇄.",
+                voice: [
+                    "“…비켜. 선 넘었어.”",
+                    "“내 등 뒤에 있어라.”"
+                ],
+                tell: "위험 감지 시 무의식적으로 상대와 출구 사이를 막는다.",
+                skills: { hack: 60, lead: 82, deceive: 68, combat: 95 },
+                ennea: { core: "6w5", values: [40, 35, 45, 50, 85, 95, 55, 40, 30] }
+            },
+            ain: {
+                name: "레온 타키스",
+                code: "AIN",
+                img: "../이미지/아인.png",
+                role: "GENIUS HACKER",
+                mbti: "INTP",
+                brief: "20대 중반 / 고스트프로토콜 해커",
+                age: "MID_20S",
+                threat: "ELEVATED",
+                logline: "햇빛을 보지 못한 창백한 천재 해커. 모니터 불빛 아래서만 감정을 폭발시킨다.",
+                motto: "“내 로드에 네가 자꾸 개입하잖아. 변수가…”",
+                visual: [
+                    "옅은 갈색 짐승의 눈, 호박색 광택.",
+                    "애쉬 브라운 언밸런스 컷.",
+                    "180cm 마른 체구, 다크 그레이 후드."
+                ],
+                personality: [
+                    "겉: 냉소적인 아웃사이더.",
+                    "내면: 고독과 정의감의 충돌.",
+                    "스트레스: 무모한 시스템 돌진."
+                ],
+                stake: "부모를 죽게 한 비리 세력 파괴.",
+                voice: [
+                    "“트래픽 튀는 거… 아니, 비켜봐.”",
+                    "“내 로드에 네가 자꾸 개입하잖아. 변수가…”"
+                ],
+                tell: "불안 시 왼손등 화상 흉터를 비비고 사탕 봉지를 구긴다.",
+                skills: { hack: 98, lead: 40, deceive: 75, combat: 45 },
+                ennea: { core: "5w4", values: [35, 30, 50, 85, 95, 60, 30, 35, 25] }
+            }
+        };
+
+        const current = data[agent] || data.sion;
+
+        nameEl.textContent = current.name;
+        codeEl.textContent = `[ CODE: ${current.code} ]`;
+        imgEl.src = current.img;
+        roleEl.textContent = current.role;
+        mbtiEl.textContent = current.mbti;
+        attachEl.textContent = current.attach;
+        briefEl.textContent = current.brief;
+        ageEl.textContent = current.age;
+        threatEl.textContent = current.threat;
+        loglineEl.textContent = current.logline;
+        mottoEl.textContent = current.motto;
+
+        visualEl.innerHTML = current.visual.map(v => `<li>${v}</li>`).join("");
+        personalityEl.innerHTML = current.personality.map(v => `<li>${v}</li>`).join("");
+        stakeEl.textContent = current.stake;
+        voiceEl.innerHTML = current.voice.map(v => `<li>${v}</li>`).join("");
+        tellEl.textContent = current.tell;
+
+        // Skills
+        const sk = current.skills;
+        document.getElementById("skill-hack").textContent = `${sk.hack}%`;
+        document.getElementById("skill-lead").textContent = `${sk.lead}%`;
+        document.getElementById("skill-deceive").textContent = `${sk.deceive}%`;
+        document.getElementById("skill-combat").textContent = `${sk.combat}%`;
+        document.getElementById("bar-hack").style.width = `${sk.hack}%`;
+        document.getElementById("bar-lead").style.width = `${sk.lead}%`;
+        document.getElementById("bar-deceive").style.width = `${sk.deceive}%`;
+        document.getElementById("bar-combat").style.width = `${sk.combat}%`;
+
+        // Radar
+        const ennea = current.ennea;
+        document.getElementById("ennea-current").textContent = ennea.core;
+
+        const labels = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+        const grid = document.getElementById("ennea-grid");
+        const shape = document.getElementById("ennea-shape");
+        const labelGroup = document.getElementById("ennea-labels");
+
+        const cx = 130, cy = 130, radius = 95;
+        const levels = 4;
+
+        for (let l = 1; l <= levels; l++) {
+            const r = (radius / levels) * l;
+            let pts = [];
+            for (let i = 0; i < 9; i++) {
+                const angle = (Math.PI * 2 / 9) * i - Math.PI / 2;
+                pts.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
+            }
+            const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            poly.setAttribute("points", pts.join(" "));
+            poly.setAttribute("fill", "none");
+            poly.setAttribute("stroke", "rgba(0,163,255,0.18)");
+            poly.setAttribute("stroke-width", "1");
+            grid.appendChild(poly);
+        }
+
+        for (let i = 0; i < 9; i++) {
+            const angle = (Math.PI * 2 / 9) * i - Math.PI / 2;
+            const x = cx + (radius + 18) * Math.cos(angle);
+            const y = cy + (radius + 18) * Math.sin(angle);
+            const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            t.setAttribute("x", x);
+            t.setAttribute("y", y);
+            t.setAttribute("text-anchor", "middle");
+            t.setAttribute("dominant-baseline", "middle");
+            t.setAttribute("font-size", "10");
+            t.textContent = labels[i];
+            labelGroup.appendChild(t);
+        }
+
+        const vals = ennea.values.map(v => Math.max(0, Math.min(100, v)));
+        let points = [];
+        for (let i = 0; i < 9; i++) {
+            const angle = (Math.PI * 2 / 9) * i - Math.PI / 2;
+            const r = radius * (vals[i] / 100);
+            points.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
+        }
+        shape.setAttribute("points", points.join(" "));
+
+        // Return to hub on click
+        document.body.addEventListener('click', () => {
+            document.body.style.opacity = "0";
+            setTimeout(() => {
+                window.location.href = '../phase_3classified_agent_profiles_hub/code.html';
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>
